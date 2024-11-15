@@ -69,6 +69,10 @@ RUN rm -rf lwtool
 
 RUN useradd -ms /bin/bash developer
 
+#Install cmoc
+ADD http://perso.b2b2c.ca/~sarrazip/dev/cmoc_0.1.89-1.deb .
+RUN dpkg -i cmoc_0.1.89-1.deb
+
 # Install
 ADD http://sun.hasenbraten.de/vasm/release/vasm.tar.gz .
 RUN tar xf vasm.tar.gz 
@@ -77,7 +81,7 @@ RUN cp vasm/vasm6809_std /usr/local/bin
 
 ADD http://sun.hasenbraten.de/vlink/release/vlink.tar.gz .
 RUN tar xf vlink.tar.gz 
-RUN make -C
+RUN make -C vlink
 RUN cp vlink/vlink /usr/local/bin
 
 RUN wget http://ibaug.de/vbcc/vbcc.tar.gz -P /home/developer
@@ -87,12 +91,10 @@ RUN chown developer:developer /home/developer/*.tar.gz
 USER developer
 WORKDIR /home/developer
 
-RUN tar xf vbcc.tar.gz
+# RUN tar xf vbcc.tar.gz
+# RUN rm *.tar.gz
+# RUN make -C vbcc
 
-RUN rm *.tar.gz
-
-
-RUN make -C vlink
 
 
 # RUN rm vasm.tar.gz
@@ -133,5 +135,7 @@ ARG COMPILER_PACKAGE_FILE=vbcc
 # RUN cp ./assembler/asl-current/Makefile.def-samples/Makefile.def-x86_64-unknown-linux ./assembler/asl-current/Makefile.def
 # RUN make -C ./assembler/asl-current
 # RUN make -C ./assembler/asl-current install
+
+
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
