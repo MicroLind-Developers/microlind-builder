@@ -41,6 +41,7 @@ RUN apt-get update && \
     libgmock-dev \
     libpthread-stubs0-dev \
     libnewlib-arm-none-eabi \
+    libwxgtk3.2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # RUN pip3 install --upgrade pip --break-system-packages
@@ -70,8 +71,9 @@ RUN rm -rf lwtool
 RUN useradd -ms /bin/bash developer
 
 #Install cmoc
-ADD http://perso.b2b2c.ca/~sarrazip/dev/cmoc_0.1.89-1.deb .
-RUN dpkg -i cmoc_0.1.89-1.deb
+# This has been lost
+# ADD http://perso.b2b2c.ca/~sarrazip/dev/cmoc_0.1.89-1.deb .
+# RUN dpkg -i cmoc_0.1.89-1.deb
 
 # Install
 ADD http://sun.hasenbraten.de/vasm/release/vasm.tar.gz .

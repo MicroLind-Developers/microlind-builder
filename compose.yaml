@@ -18,7 +18,7 @@ services:
     volumes:
       - type: bind
         source: ../
-        target: /home/ubuntu/microlind
+        target: /home/developer/microlind
 
       #- type: bind
       #  source: ${HOME}/.gitconfig
