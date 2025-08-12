@@ -4,6 +4,7 @@ services:
 
     # To make the environment more explicit
     hostname: microlind-builder
+    user: "developer"
 
     init: true
 

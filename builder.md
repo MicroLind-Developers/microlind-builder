@@ -2,7 +2,12 @@
 
 To generate an docker image, run:
 
-   docker ....
+   docker compose build
+
+
+To start container:
+
+   docker run
 
 
 

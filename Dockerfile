@@ -11,6 +11,7 @@ ARG USER_NAME=developer
 RUN apt-get update && \
     apt-get install -y apt-utils \
     tzdata \
+    udev \
     build-essential \
     cmake \
     gdb \
@@ -47,7 +48,15 @@ RUN apt-get update && \
     libpthread-stubs0-dev \
     libnewlib-arm-none-eabi \
     libwxgtk3.2-dev \
+    libusb-1.0-0-dev \
+    gcc-avr \
+    binutils-avr \
+    avr-libc \
+    gdb-avr \
     && rm -rf /var/lib/apt/lists/*
+
+
+
 
 # RUN pip3 install --upgrade pip --break-system-packages
 
@@ -115,6 +124,13 @@ USER ${USER_NAME}
 WORKDIR /home/${USER_NAME}
 
 
+RUN git clone https://gitlab.com/DavidGriffith/minipro
+RUN make -C minipro
+RUN make -C minipro install
+RUN cp ./minipro/udev/*.rules /etc/udev/rules.d/
+# RUN udevadm trigger
+
+# RUN usermod -a -G plugdev developer
 
 # RUN tar xf vbcc.tar.gz
 # RUN rm *.tar.gz
@@ -160,7 +176,6 @@ ARG COMPILER_PACKAGE_FILE=vbcc
 # RUN cp ./assembler/asl-current/Makefile.def-samples/Makefile.def-x86_64-unknown-linux ./assembler/asl-current/Makefile.def
 # RUN make -C ./assembler/asl-current
 # RUN make -C ./assembler/asl-current install
-
 
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
