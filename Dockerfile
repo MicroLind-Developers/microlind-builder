@@ -3,6 +3,9 @@ FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Europe/Stockholm
+ARG HOST_UID=1000
+ARG HOST_GID=1000
+ARG USER_NAME=developer
 
 # Basic build packages, for building and analysing
 RUN apt-get update && \
@@ -21,6 +24,8 @@ RUN apt-get update && \
     wget \
     curl \
     patch \
+    bison \
+    flex \
     libsasl2-2 \
     libc6-i386 \
     bash-completion \
@@ -68,30 +73,48 @@ RUN make -C ./lwtool/${COMPILER_PACKAGE_FILE}
 RUN make -C ./lwtool/${COMPILER_PACKAGE_FILE} install
 RUN rm -rf lwtool
 
-RUN useradd -ms /bin/bash developer
+RUN set -eux; \
+    if ! getent group "${HOST_GID}" >/dev/null; then \
+        groupadd -g "${HOST_GID}" "${USER_NAME}"; \
+    fi; \
+    if id -u "${USER_NAME}" >/dev/null 2>&1; then \
+        usermod -u "${HOST_UID}" -g "${HOST_GID}" "${USER_NAME}"; \
+    else \
+        useradd -m -s /bin/bash -u "${HOST_UID}" -g "${HOST_GID}" "${USER_NAME}"; \
+    fi; \
+    chown -R "${HOST_UID}:${HOST_GID}" "/home/${USER_NAME}"
+
+WORKDIR /tmp/build
 
 #Install cmoc
-# This has been lost
-# ADD http://perso.b2b2c.ca/~sarrazip/dev/cmoc_0.1.89-1.deb .
-# RUN dpkg -i cmoc_0.1.89-1.deb
+ADD http://gvlsywt.cluster051.hosting.ovh.net/dev/cmoc-0.1.93.tar.gz .
+RUN tar xf cmoc-0.1.93.tar.gz
+WORKDIR /tmp/build/cmoc-0.1.93
+RUN ./configure --prefix=/usr/local && \
+    make && \
+    make install
+
+WORKDIR /tmp/build
 
 # Install
 ADD http://sun.hasenbraten.de/vasm/release/vasm.tar.gz .
-RUN tar xf vasm.tar.gz 
-RUN make -C vasm CPU=6809 SYNTAX=std
-RUN cp vasm/vasm6809_std /usr/local/bin
+RUN tar xf vasm.tar.gz && \
+    make -C vasm CPU=6809 SYNTAX=std && \
+    cp vasm/vasm6809_std /usr/local/bin
 
 ADD http://sun.hasenbraten.de/vlink/release/vlink.tar.gz .
-RUN tar xf vlink.tar.gz 
-RUN make -C vlink
-RUN cp vlink/vlink /usr/local/bin
+RUN tar xf vlink.tar.gz && \
+    make -C vlink && \
+    cp vlink/vlink /usr/local/bin
 
-RUN wget http://ibaug.de/vbcc/vbcc.tar.gz -P /home/developer
+RUN wget http://ibaug.de/vbcc/vbcc.tar.gz -P /home/${USER_NAME}
 
-RUN chown developer:developer /home/developer/*.tar.gz
+# Cleanup and switch to unprivileged user
+RUN rm -rf /tmp/build
+USER ${USER_NAME}
+WORKDIR /home/${USER_NAME}
 
-USER developer
-WORKDIR /home/developer
+
 
 # RUN tar xf vbcc.tar.gz
 # RUN rm *.tar.gz
