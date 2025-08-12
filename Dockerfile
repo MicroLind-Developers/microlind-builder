@@ -124,10 +124,10 @@ USER ${USER_NAME}
 WORKDIR /home/${USER_NAME}
 
 
-RUN git clone https://gitlab.com/DavidGriffith/minipro
-RUN make -C minipro
-RUN make -C minipro install
-RUN cp ./minipro/udev/*.rules /etc/udev/rules.d/
+# RUN git clone https://gitlab.com/DavidGriffith/minipro
+# RUN make -C minipro
+# RUN make -C minipro install
+# RUN cp ./minipro/udev/*.rules /etc/udev/rules.d/
 # RUN udevadm trigger
 
 # RUN usermod -a -G plugdev developer
