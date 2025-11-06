@@ -27,6 +27,7 @@ RUN apt-get update && \
     patch \
     bison \
     flex \
+    check \
     libsasl2-2 \
     libc6-i386 \
     bash-completion \
@@ -96,12 +97,8 @@ RUN set -eux; \
 WORKDIR /tmp/build
 
 #Install cmoc
-ADD http://gvlsywt.cluster051.hosting.ovh.net/dev/cmoc-0.1.93.tar.gz .
-RUN tar xf cmoc-0.1.93.tar.gz
-WORKDIR /tmp/build/cmoc-0.1.93
-RUN ./configure --prefix=/usr/local && \
-    make && \
-    make install
+ADD http://gvlsywt.cluster051.hosting.ovh.net/dev/cmoc_0.1.97-1.deb .
+RUN dpkg -i  cmoc_0.1.97-1.deb
 
 WORKDIR /tmp/build
 
