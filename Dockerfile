@@ -46,18 +46,20 @@ RUN apt-get update && \
     cppcheck \
     libgtest-dev \
     libgmock-dev \
-    libpthread-stubs0-dev \
-    libnewlib-arm-none-eabi \
-    libwxgtk3.2-dev \
-    libusb-1.0-0-dev \
     gcc-avr \
     binutils-avr \
     avr-libc \
     gdb-avr \
+    check \
     && rm -rf /var/lib/apt/lists/*
 
-
-
+RUN apt-get update && \
+    apt-get install -y \
+    libpthread-stubs0-dev \
+    libnewlib-arm-none-eabi \
+    libwxgtk3.2-dev \
+    libusb-1.0-0-dev 
+    
 
 # RUN pip3 install --upgrade pip --break-system-packages
 
@@ -71,16 +73,16 @@ RUN apt-get update && \
 #    prettyprint==0.1.5 \
 #    pyparsing==2.2.0 
 
-# Install lwtool
-ARG COMPILER_NAME=lwtools
-ARG COMPILER_VERSION=4.22
-ARG COMPILER_PACKAGE_FILE=${COMPILER_NAME}-${COMPILER_VERSION}
+#Install lwtool
+ARG LWTOOL_NAME=lwtools
+ARG LWTOOL_VERSION=4.24
+ARG LWTOOL_PACKAGE_FILE=${LWTOOL_NAME}-${LWTOOL_VERSION}
 RUN mkdir lwtool
-ADD http://www.lwtools.ca/releases/lwtools/${COMPILER_PACKAGE_FILE}.tar.gz .
-RUN tar xf ${COMPILER_PACKAGE_FILE}.tar.gz -C lwtool/
-RUN rm ${COMPILER_PACKAGE_FILE}.tar.gz
-RUN make -C ./lwtool/${COMPILER_PACKAGE_FILE}
-RUN make -C ./lwtool/${COMPILER_PACKAGE_FILE} install
+ADD http://www.lwtools.ca/releases/lwtools/${LWTOOL_PACKAGE_FILE}.tar.gz .
+RUN tar xf ${LWTOOL_PACKAGE_FILE}.tar.gz -C lwtool/
+RUN rm ${LWTOOL_PACKAGE_FILE}.tar.gz
+RUN make -C ./lwtool/${LWTOOL_PACKAGE_FILE}
+RUN make -C ./lwtool/${LWTOOL_PACKAGE_FILE} install
 RUN rm -rf lwtool
 
 RUN set -eux; \
@@ -97,8 +99,13 @@ RUN set -eux; \
 WORKDIR /tmp/build
 
 #Install cmoc
-ADD http://gvlsywt.cluster051.hosting.ovh.net/dev/cmoc_0.1.97-1.deb .
-RUN dpkg -i  cmoc_0.1.97-1.deb
+ARG CMOC_VERSION=0.1.99
+ADD http://gvlsywt.cluster051.hosting.ovh.net/dev/cmoc-${CMOC_VERSION}.tar.gz .
+RUN tar xf cmoc-${CMOC_VERSION}.tar.gz
+WORKDIR /tmp/build/cmoc-${CMOC_VERSION}
+RUN ./configure --prefix=/usr/local && \
+    make && \
+    make install
 
 WORKDIR /tmp/build
 
